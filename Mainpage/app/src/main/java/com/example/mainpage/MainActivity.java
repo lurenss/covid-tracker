@@ -5,12 +5,17 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -57,7 +62,34 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call call, Response response) throws IOException {
                 if(response.isSuccessful()){
                     String res1 = response.body().string();
-                    Log.w("res", res1);
+                    try {
+                        JSONObject js1 =  new JSONObject(res1);
+                        JSONObject js2 =  new JSONObject(res1);
+                        js1 = js1.getJSONObject("timeline");
+                        js1 = js1.getJSONObject("cases");
+                        js2 = js2.getJSONObject("timeline");
+                        js2 = js2.getJSONObject("deaths");
+
+
+                        ArrayList cases = new ArrayList();
+                        ArrayList deaths = new ArrayList();
+                        Iterator<String> iter = js1.keys();
+
+                        while (iter.hasNext()) {
+                            String key = iter.next();
+                            Object valcase = js1.get(key);
+                            Object valdeath = js2.get(key);
+                            cases.add(valcase);
+                            deaths.add(valdeath);
+                            Log.i("cases", String.valueOf(valcase));
+                            Log.i("death", String.valueOf(valcase));
+                        }
+
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -71,8 +103,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if(response.isSuccessful()){
-                    String res2 = response.body().string();
-                    Log.w("res", res2);
+                    try{
+                        String res2 = response.body().string();
+                        JSONObject js2 =  new JSONObject(res2);
+                        String todayCases =  js2.getString("todayCases");
+                        String todayDeaths =  js2.getString("todayDeaths");
+                        String recovered =  js2.getString("recovered");
+                        Log.i("todayCases",todayCases);
+                        Log.i("todayDeaths",todayDeaths);
+                        Log.i("recovered",recovered);
+                    }
+                    catch(JSONException e){
+                        e.printStackTrace();
+                    }
                 }
             }
         });
